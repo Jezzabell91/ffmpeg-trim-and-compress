@@ -186,10 +186,10 @@ const Converter = () => {
       File:  <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.FileName}</span>
     </p>
     <p className="text-sm font-medium text-gray-500">
-    Duration: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.Duration}</span>
+    Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(inputVideoInfo.Duration)}</span>
     </p>
     <p className="text-sm font-medium text-gray-500">
-    Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.Duration}</span>
+    Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.FileSize}MB</span>
     </p>
     <p className="text-sm font-medium text-gray-500">
     Type: <span className="mt-1 text-sm font-normal text-gray-900">{(inputVideoInfo.FileType)}</span>
@@ -330,10 +330,10 @@ const Converter = () => {
             File:  <span className="mt-1 text-sm font-normal text-gray-900">{outputVideoInfo.FileName}</span>
             </p>
             <p className="text-sm font-medium text-gray-500">
-            Duration: <span className="mt-1 text-sm font-normal text-gray-900">{outputVideoInfo.Duration}</span>
+            Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(outputVideoInfo.Duration)}</span>
             </p>
             <p className="text-sm font-medium text-gray-500">
-            Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileSize)}</span>
+            Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileSize)}MB</span>
             </p>
             <p className="text-sm font-medium text-gray-500">
             Type: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileType)}</span>
