@@ -2,7 +2,7 @@
 
 ## Why am I making this? 
 
-I have been using ffmpeg as a command line tool for years to trim and convert my gaming clips from large files, which are roughly 2GB for 5 minute clips, to h.264 and h.265 encoded clips. Resulting in much smaller file sizes that can be easily shared online.  However the person I play most frequently with is pretty average at working with computers and his current method of sharing his best gaming moments is to use his phone to record his screen as the clip plays in a media player. 
+I have been using ffmpeg as a command line tool for years to trim and convert my gaming clips from large files, which are roughly 2GB for 5 minute clips, to h.264 encoded clips. Resulting in much smaller file sizes that can be easily shared online.  However the person I play most frequently with is pretty average at working with computers and his current method of sharing his best gaming moments is to use his phone to record his screen as the clip plays in a media player. 
 
 ![Call of Duty recorded with phone](./filming_screen_clip.gif)
 
@@ -42,7 +42,7 @@ Conversion can take a looooong time.
 - [ ] Make it a PWA
 - [ ] Deploy to Vercel
 - [ ] React-form-hook
-- [ ] Options for resize, quality
+- [x] Options for resize, quality
 - [x] Improve ffmpeg speed (input seeking trim first before doing transcoding)
 
 
