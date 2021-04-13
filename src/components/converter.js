@@ -20,6 +20,7 @@ const Converter = () => {
   const [startTrim, setStartTrim] = useState('00:00:00.000')
   const [endTrim, setEndTrim] = useState(0)
   const [quality, setQuality] = useState(480)
+  const [activeRadio, setActiveRadio] = useState(0)
 
 
 
@@ -36,6 +37,11 @@ const Converter = () => {
   useEffect(() => {
     console.log("rendering:", startTrim, endTrim)
   }, [startTrim, endTrim])
+
+  useEffect(() => {
+    console.log("quality:", quality)
+  }, [quality])
+
 
   const handleDrop = async (files) => {
     const file = files[0]
@@ -81,6 +87,18 @@ const Converter = () => {
     setQuality(e.target.value)
   }
 
+  const handleReset = () => {
+    setinputVideoInfo({})  
+    setinputVideo(null) 
+    setOutputVideoInfo({})
+    setOutputVideo(null)
+    setStartTrim('00:00:00.000')
+    setEndTrim(0)
+    setQuality(480)
+    setActiveRadio(0)
+  }
+
+
   const convertToH264 = async () => {
     setConverting(true)
     // Turn file data into Uint8Array
@@ -100,7 +118,7 @@ const Converter = () => {
     // This converts to h265 format. Not implemented as h265 playback is not currently supported by browsers. 
     // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
     
-    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', `scale=-1:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
+    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
     const outputData = ffmpeg.FS('readFile', 'output.mp4')
     const outputVideo = new Blob([outputData.buffer], { type: 'video/mp4' })
     
@@ -119,6 +137,7 @@ const Converter = () => {
     
     // // Create a URL
     const url = URL.createObjectURL(outputVideo)
+    console.log(url)
     setConverting(false)
     setOutputVideo(url)
   }
@@ -127,125 +146,220 @@ const Converter = () => {
 
 
 
-  return ready ? (
-    <div className="App">
+  return  (
+    <div className="App md:w-screen md:h-screen lg:bg-gray-900 bg-green-600 grid grid-cols-1 place-items-center">
 
+    { !inputVideo && 
+    <div className="">
       <Dropzone onDrop={handleDrop} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
         {({ getRootProps, getInputProps }) => (
-          <div {...getRootProps({ className: "dropzone" })}>
+          <div className="w-full h-full bg-green-100">
+          <div {...getRootProps({ className: "w-screen border-4 border-dashed h-screen bg-gray-900 grid grid-cols-1 place-items-center" })}>
             <input {...getInputProps()} />
-            <p>Drag 'n' drop a video, or click here select a video</p>
+            <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-bold text-center text-green-600">drag and drop<br></br>or click to select a video</p>
+          </div>
           </div>
         )}
       </Dropzone>
-
-
-      { inputVideo && 
+      </div>
+    }  
+    {  inputVideo && 
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 place-items-center gap-y-12">
+  <div class="max-w-3xl mx-auto">
+        <div className="bg-green-600 overflow-hidden rounded-lg max-w-xl h-full grid grid-cols-1 place-items-around gap-y-12">
+  <div className="px-4 py-5 sm:p-6 ">
+    
+    {  inputVideo &&  
       <>
+    {/* Card with footer */}
+    <div className="bg-gray-50 overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+      <div className="px-4 py-5 sm:p-6">
         <video
           controls
           width="480"
           src={URL.createObjectURL(inputVideo)}>
         </video>
-              {/* TODO: Separate to own component */}
-        <div>
-          File: {inputVideoInfo.FileName} <br></br>
-          Duration: {inputVideoInfo.Duration} Seconds <br></br>
-          Size: {(inputVideoInfo.FileSize)}MB
-          <br></br>
-          Type: {(inputVideoInfo.FileType)}
+        <div className="px-4 py-4 sm:px-6">
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+<div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
+    <p className="text-sm font-medium text-gray-500">
+      File:  <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.FileName}</span>
+    </p>
+    <p className="text-sm font-medium text-gray-500">
+    Duration: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.Duration}</span>
+    </p>
+    <p className="text-sm font-medium text-gray-500">
+    Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.Duration}</span>
+    </p>
+    <p className="text-sm font-medium text-gray-500">
+    Type: <span className="mt-1 text-sm font-normal text-gray-900">{(inputVideoInfo.FileType)}</span>
+    </p>
+  </div>
+  </div>
         </div>
-        <br></br>
-
-        <label>Start:</label>
-        <InputMask formatChars={{
-        '9': '[0-9]',
-        '5': '[0-5]',
-      }}
-      mask="99:59:59.999" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
-        {(inputProps) => (
-          <input
-            {...inputProps}
-            type="text"
-            className="w-24 text-center"
-          />
-        )}
-      </InputMask>
-        
-        {/* <label>Start:
-        <input type="text" pattern="^(\d{2})(:[0-5]\d){2}(\.\d{3})$" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}></input>
-        </label> */}
-        <br></br>
-        <label>End:  </label>
-        <InputMask formatChars={{
-        '9': '[0-9]',
-        '5': '[0-5]',
-      }}
-      mask="99:59:59.999" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
-        {(inputProps) => (
-          <input
-            {...inputProps}
-            type="text"
-            className="w-24 text-center"
-          />
-        )}
-      </InputMask>
-        {/* <input type="text" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}></input> */}
-        <br></br>
-          <div onChange={handleQualityChange}>
-            <label>
-              Quality:
-            <input type="radio" name="quality" value="480"/>
-
-              480P
-
-            <input type="radio" name="quality" value="720" />
-              720P
-
-            <input type="radio" name="quality" value="1080" />
-              1080P
-            </label>
-          </div>
-
-        <button onClick={convertToH264}>Convert</button>
-      </>
-      }
-      <br></br>
-      { converting && <>
-      <p>Converting... It could take a while, please be patient</p>
-      <p>If you can hear your computer fans it's probably working</p>
-      </>}
-      { outputVideo &&
-        <>
-          <br></br>
-          <br></br>
-          <video
-            controls
-            width="480"
-            src={outputVideo}>
-          </video>
-              {/* TODO: Separate to own component */}
-          <div>
-            File: {outputVideoInfo.FileName} <br></br>
-            Duration: {outputVideoInfo.Duration} Seconds <br></br>
-            Size: {(outputVideoInfo.FileSize)}MB
-            <br></br>
-            Type: {(outputVideoInfo.FileType)}
-          </div>
-        </>
-      }
-
-
-
-
-
-
+        </div>
     </div>
+
+    
+    </>
+}
+{  (!outputVideo && !converting) &&  
+<> 
+  <fieldset>
+        <div className="flex justify-around w-full my-8 gap-4">
+        <div className="flex-grow">
+          <label htmlFor="start" className="sr-only">Start</label>
+            <div className="mt-1 relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <span className="text-gray-500 hidden md:inline">
+        Start
+      </span>
+    </div>
+              <InputMask formatChars={{
+                      '9': '[0-9]',
+                      '5': '[0-5]',
+                    }}
+                    mask="99:59:59.999" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
+                      {(inputProps) => (
+                        <input
+                          {...inputProps}
+                          type="text"
+                          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md text-center"
+                          name="start"
+                        />
+                      )}
+              </InputMask>
+            </div>
+        </div>
+
+        <div className="flex-grow">
+        <label htmlFor="end" className="sr-only">End</label>
+        <div className="mt-1 relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <span className="text-gray-500 hidden md:inline">
+        End
+      </span>
+    </div>
+        <InputMask formatChars={{
+                '9': '[0-9]',
+                '5': '[0-5]',
+              }}
+              mask="99:59:59.999" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
+                {(inputProps) => (
+                  <input
+                    {...inputProps}
+                    type="text"
+                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md w-24 text-center"
+                  />
+                )}
+              </InputMask>
+        </div>
+        </div>
+        </div>
+  <legend className="sr-only">
+    Video Quality
+  </legend>
+  <div className="relative bg-pink-50 rounded-md -space-y-px" onChange={handleQualityChange}>
+
+    <label className={`${(activeRadio === 1) ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(1)} >
+      <div className="flex items-center text-sm">
+        <input type="radio" name="quality" value="480" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-0-label" aria-describedby="quality-0-description-0 quality-0-description-1"/>
+        <span id="quality-0-label" className="ml-3 font-medium text-gray-900">480p</span>
+      </div>
+      <p id="quality-0-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
+        {/* <span className={`${activeRadio === 1 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Very Low Size </span> */}
+        <span className={`${activeRadio === 1 ? 'text-indigo-700' : 'text-gray-500'}`}> Medium Conversion Time</span>
+      </p>
+      <p id="quality-0-description-1" className={`${activeRadio === 1 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~50mb</p>
+    </label>
+
+    <label className={`${activeRadio === 2 ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(2)} >
+      <div className="flex items-center text-sm">
+        <input type="radio" name="quality" value="720" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-1-label" aria-describedby="quality-1-description-0 quality-1-description-1"/>
+        <span id="quality-1-label" className="ml-3 font-medium text-gray-900">720p</span>
+      </div>
+      <p id="quality-1-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
+        {/* <span className={`${activeRadio === 2 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Low Size </span> */}
+        <span className={`${activeRadio === 2 ? 'text-indigo-700' : 'text-gray-500'}`}> Slow Conversion Time</span>
+      </p>
+      <p id="quality-1-description-1" className={`${activeRadio === 2 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~120mb</p>
+    </label> 
+
+    <label className={`${activeRadio === 3 ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(3)} >
+      <div className="flex items-center text-sm">
+        <input type="radio" name="quality" value="1080" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-2-label" aria-describedby="quality-2-description-0 quality-2-description-1"/>
+        <span id="quality-2-label" className="ml-3 font-medium text-gray-900">1080p</span>
+      </div>
+      <p id="quality-2-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
+        {/* <span className={`${activeRadio === 3 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Mid Size </span> */}
+        <span className={`${activeRadio === 3 ? 'text-indigo-700' : 'text-gray-500'}`}> Very Slow Conversion Time</span>
+      </p>
+      <p id="quality-2-description-1" className={`${activeRadio === 3 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~200mb</p>
+    </label> 
+
+  </div>
+</fieldset>
+<div className="flex items-center justify-around gap-4 w-full mt-8">
+        <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-blue-300 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={convertToH264}>Convert</button>
+        <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+        </div>
+</>
+}
+
+
+
+        { converting && 
+          <>
+          <p>Converting... It could take a while, please be patient</p>
+          <p>If you can hear your computer fans it's probably working</p>
+          </>
+    }
+          {outputVideo &&
+            <>
+            <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+            <div className="px-4 py-5 sm:p-6">
+              <video
+                controls
+                width="480"
+                src={outputVideo}>
+              </video>
+              <div className="px-4 py-4 sm:px-6">
+              <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
+            <p className="text-sm font-medium text-gray-500">
+            File:  <span className="mt-1 text-sm font-normal text-gray-900">{outputVideoInfo.FileName}</span>
+            </p>
+            <p className="text-sm font-medium text-gray-500">
+            Duration: <span className="mt-1 text-sm font-normal text-gray-900">{outputVideoInfo.Duration}</span>
+            </p>
+            <p className="text-sm font-medium text-gray-500">
+            Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileSize)}</span>
+            </p>
+            <p className="text-sm font-medium text-gray-500">
+            Type: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileType)}</span>
+            </p>
+            </div>
+            </div>
+              </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-around gap-4 w-full mt-8">
+        <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+        </div>
+          </> 
+        }
+
+
+        </div>
+        </div>
+
+</div>
+</div>
+}
+    </div>
+
   )
-    :
-    (
-      <p>Loading...</p>
-    )
+
 }
 
 export default Converter
