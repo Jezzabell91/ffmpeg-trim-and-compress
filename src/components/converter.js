@@ -19,6 +19,7 @@ const Converter = () => {
   const [converting, setConverting] = useState(false)
   const [startTrim, setStartTrim] = useState('00:00:00.000')
   const [endTrim, setEndTrim] = useState(0)
+  const [quality, setQuality] = useState(480)
 
 
 
@@ -75,6 +76,11 @@ const Converter = () => {
     console.log(`${position} trim: ${timerValue}`)
   }
 
+  const handleQualityChange = e => {
+    console.log(e.target.value)
+    setQuality(e.target.value)
+  }
+
   const convertToH264 = async () => {
     setConverting(true)
     // Turn file data into Uint8Array
@@ -90,9 +96,11 @@ const Converter = () => {
     const data = ffmpeg.FS('readFile', 'trimOutput.mp4')
     
     ffmpeg.FS('writeFile', 'input.mp4', data)
-    console.log('123bigboy')
+
+    // This converts to h265 format. Not implemented as h265 playback is not currently supported by browsers. 
     // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
-    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', 'scale=-1:1080', '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
+    
+    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', `scale=-1:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
     const outputData = ffmpeg.FS('readFile', 'output.mp4')
     const outputVideo = new Blob([outputData.buffer], { type: 'video/mp4' })
     
@@ -148,6 +156,8 @@ const Converter = () => {
           Type: {(inputVideoInfo.FileType)}
         </div>
         <br></br>
+
+        <label>Start:</label>
         <InputMask formatChars={{
         '9': '[0-9]',
         '5': '[0-5]',
@@ -166,7 +176,7 @@ const Converter = () => {
         <input type="text" pattern="^(\d{2})(:[0-5]\d){2}(\.\d{3})$" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}></input>
         </label> */}
         <br></br>
-        <label>End:</label>
+        <label>End:  </label>
         <InputMask formatChars={{
         '9': '[0-9]',
         '5': '[0-5]',
@@ -181,10 +191,22 @@ const Converter = () => {
         )}
       </InputMask>
         {/* <input type="text" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}></input> */}
-        
         <br></br>
+          <div onChange={handleQualityChange}>
+            <label>
+              Quality:
+            <input type="radio" name="quality" value="480"/>
 
-        <br></br>
+              480P
+
+            <input type="radio" name="quality" value="720" />
+              720P
+
+            <input type="radio" name="quality" value="1080" />
+              1080P
+            </label>
+          </div>
+
         <button onClick={convertToH264}>Convert</button>
       </>
       }
