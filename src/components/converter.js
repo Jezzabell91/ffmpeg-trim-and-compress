@@ -87,6 +87,17 @@ const Converter = () => {
     setQuality(e.target.value)
   }
 
+  const handleReset = () => {
+    setinputVideoInfo({})  
+    setinputVideo(null) 
+    setOutputVideoInfo({})
+    setOutputVideo(null)
+    setStartTrim('00:00:00.000')
+    setEndTrim(0)
+    setQuality(480)
+    setActiveRadio(0)
+  }
+
 
   const convertToH264 = async () => {
     setConverting(true)
@@ -136,16 +147,16 @@ const Converter = () => {
 
 
   return  (
-    <div className="App">
+    <div className="App md:w-screen md:h-screen lg:bg-gray-900 bg-green-600 grid grid-cols-1 place-items-center">
 
     { !inputVideo && 
     <div className="">
       <Dropzone onDrop={handleDrop} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
         {({ getRootProps, getInputProps }) => (
           <div className="w-full h-full bg-green-100">
-          <div {...getRootProps({ className: "w-screen border-8 border-dashed h-screen bg-green-100 grid grid-cols-1 place-items-center" })}>
+          <div {...getRootProps({ className: "w-screen border-4 border-dashed h-screen bg-gray-900 grid grid-cols-1 place-items-center" })}>
             <input {...getInputProps()} />
-            <p className="sm:text-xl md:text-2xl lg:text-4xl xl:text-6xl font-bold text-center">drag and drop<br></br>or click to select a video</p>
+            <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-bold text-center text-green-600">drag and drop<br></br>or click to select a video</p>
           </div>
           </div>
         )}
@@ -153,15 +164,15 @@ const Converter = () => {
       </div>
     }  
     {  inputVideo && 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 place-items-center">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 place-items-center gap-y-12">
   <div class="max-w-3xl mx-auto">
-        <div className="bg-gray-200 overflow-hidden rounded-lg max-w-xl">
+        <div className="bg-green-600 overflow-hidden rounded-lg max-w-xl h-full grid grid-cols-1 place-items-around gap-y-12">
   <div className="px-4 py-5 sm:p-6 ">
     
     {  inputVideo &&  
       <>
     {/* Card with footer */}
-    <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+    <div className="bg-gray-50 overflow-hidden shadow rounded-lg divide-y divide-gray-200">
       <div className="px-4 py-5 sm:p-6">
         <video
           controls
@@ -248,7 +259,7 @@ const Converter = () => {
   <legend className="sr-only">
     Video Quality
   </legend>
-  <div className="relative bg-white rounded-md -space-y-px" onChange={handleQualityChange}>
+  <div className="relative bg-pink-50 rounded-md -space-y-px" onChange={handleQualityChange}>
 
     <label className={`${(activeRadio === 1) ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(1)} >
       <div className="flex items-center text-sm">
@@ -288,6 +299,10 @@ const Converter = () => {
 
   </div>
 </fieldset>
+<div className="flex items-center justify-around gap-4 w-full mt-8">
+        <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-blue-300 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={convertToH264}>Convert</button>
+        <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+        </div>
 </>
 }
 
@@ -328,13 +343,13 @@ const Converter = () => {
               </div>
               </div>
             </div>
+            <div className="flex items-center justify-around gap-4 w-full mt-8">
+        <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+        </div>
           </> 
         }
 
-<div className="flex items-center justify-around gap-4 w-full mt-8">
-        <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-blue-300 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={convertToH264}>Convert</button>
-        <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={() => setinputVideo(null)}>Reset</button>
-        </div>
+
         </div>
         </div>
 
