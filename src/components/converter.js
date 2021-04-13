@@ -4,8 +4,9 @@ import Dropzone from 'react-dropzone'
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
 import bytesToMegaBytes from '../helpers/bytesToMegaBytes'
 import convertTimeFormat from '../helpers/convertTimeFormat'
+import convertTimeToSeconds from '../helpers/convertTimeToSeconds'
 import endMinusStart from '../helpers/endMinusStart'
-
+import InputMask from "react-input-mask"
 
 const ffmpeg = createFFmpeg({ log: true })
 
@@ -16,7 +17,7 @@ const Converter = () => {
   const [outputVideo, setOutputVideo] = useState()
   const [ready, setReady] = useState(false)
   const [converting, setConverting] = useState(false)
-  const [startTrim, setStartTrim] = useState(convertTimeFormat('0'))
+  const [startTrim, setStartTrim] = useState('00:00:00.000')
   const [endTrim, setEndTrim] = useState(0)
 
 
@@ -30,6 +31,10 @@ const Converter = () => {
   useEffect(() => {
     load()
   }, [])
+
+  useEffect(() => {
+    console.log("rendering:", startTrim, endTrim)
+  }, [startTrim, endTrim])
 
   const handleDrop = async (files) => {
     const file = files[0]
@@ -53,9 +58,19 @@ const Converter = () => {
     let timerValue = e.target.value
     
     if (position === 'start'){
-      setStartTrim(timerValue)
+      if(convertTimeToSeconds(timerValue) > convertTimeToSeconds(endTrim)) {
+        alert("Start Trim can not be more than End Trim")
+        setStartTrim("00:00:00.000")
+      } else {
+        setStartTrim(timerValue)
+      }
     } else if (position === 'end'){
-      setEndTrim(timerValue)
+      if(convertTimeToSeconds(timerValue) > inputVideo.Duration) {
+        alert("End Trim outside boundary of video duration")
+        setEndTrim(convertTimeFormat(inputVideo.Duration))
+      } else {
+        setEndTrim(timerValue)
+      }
     }
     console.log(`${position} trim: ${timerValue}`)
   }
@@ -75,7 +90,9 @@ const Converter = () => {
     const data = ffmpeg.FS('readFile', 'trimOutput.mp4')
     
     ffmpeg.FS('writeFile', 'input.mp4', data)
-    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-c:v', 'libx264', '-crf', '23', 'output.mp4')
+    console.log('123bigboy')
+    // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
+    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', 'scale=-1:1080', '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
     const outputData = ffmpeg.FS('readFile', 'output.mp4')
     const outputVideo = new Blob([outputData.buffer], { type: 'video/mp4' })
     
@@ -119,7 +136,7 @@ const Converter = () => {
       <>
         <video
           controls
-          width="350"
+          width="480"
           src={URL.createObjectURL(inputVideo)}>
         </video>
               {/* TODO: Separate to own component */}
@@ -131,13 +148,40 @@ const Converter = () => {
           Type: {(inputVideoInfo.FileType)}
         </div>
         <br></br>
-        <label>Start:
-        <input type="text" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}></input>
-        </label>
+        <InputMask formatChars={{
+        '9': '[0-9]',
+        '5': '[0-5]',
+      }}
+      mask="99:59:59.999" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
+        {(inputProps) => (
+          <input
+            {...inputProps}
+            type="text"
+            className="w-24 text-center"
+          />
+        )}
+      </InputMask>
+        
+        {/* <label>Start:
+        <input type="text" pattern="^(\d{2})(:[0-5]\d){2}(\.\d{3})$" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}></input>
+        </label> */}
         <br></br>
-        <label>End:
-        <input type="text" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}></input>
-        </label>
+        <label>End:</label>
+        <InputMask formatChars={{
+        '9': '[0-9]',
+        '5': '[0-5]',
+      }}
+      mask="99:59:59.999" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
+        {(inputProps) => (
+          <input
+            {...inputProps}
+            type="text"
+            className="w-24 text-center"
+          />
+        )}
+      </InputMask>
+        {/* <input type="text" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}></input> */}
+        
         <br></br>
 
         <br></br>
@@ -155,7 +199,7 @@ const Converter = () => {
           <br></br>
           <video
             controls
-            width="350"
+            width="480"
             src={outputVideo}>
           </video>
               {/* TODO: Separate to own component */}
