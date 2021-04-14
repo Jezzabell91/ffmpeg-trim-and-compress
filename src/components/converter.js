@@ -35,11 +35,11 @@ const Converter = () => {
   }, [])
 
   useEffect(() => {
-    console.log("rendering:", startTrim, endTrim)
+    // console.log("rendering:", startTrim, endTrim)
   }, [startTrim, endTrim])
 
   useEffect(() => {
-    console.log("quality:", quality)
+    // console.log("quality:", quality)
   }, [quality])
 
 
@@ -55,35 +55,32 @@ const Converter = () => {
       'FileType': info.Format
     }
 
-    console.log(metadata)
+    // console.log(metadata)
     setEndTrim(convertTimeFormat(metadata.Duration))
     setinputVideoInfo(metadata)
     setinputVideo(file)
+  }
+
+  const handleRejectedFiles = () => {
+
+    alert("Make sure that files are in mp4 format and are less than 2GB")
+    handleReset()
   }
 
   const handleChange = (e, position) => {
     let timerValue = e.target.value
 
     if (position === 'start') {
-      if (convertTimeToSeconds(timerValue) > convertTimeToSeconds(endTrim)) {
-        alert("Start Trim can not be more than End Trim")
-        setStartTrim("00:00:00.000")
-      } else {
         setStartTrim(timerValue)
       }
-    } else if (position === 'end') {
-      if (convertTimeToSeconds(timerValue) > inputVideo.Duration) {
-        alert("End Trim outside boundary of video duration")
-        setEndTrim(convertTimeFormat(inputVideo.Duration))
-      } else {
+    else if (position === 'end') {
         setEndTrim(timerValue)
       }
-    }
-    console.log(`${position} trim: ${timerValue}`)
+    // console.log(`${position} trim: ${timerValue}`)
   }
 
   const handleQualityChange = e => {
-    console.log(e.target.value)
+    // console.log(e.target.value)
     setQuality(e.target.value)
   }
 
@@ -98,8 +95,21 @@ const Converter = () => {
     setActiveRadio(0)
   }
 
+  const handleConvert = () => {
+    // Handle Errors 
+    if(endMinusStart(endTrim, startTrim) < 0){
+      alert("end value must be bigger than start value")
+    // } else if(endMinusStart(convertTimeFormat(inputVideoInfo.Duration), endTrim) < 0) {
+    } else if(inputVideoInfo.Duration - convertTimeToSeconds(endTrim) < 0) {
+      alert("end value must be less than input video duration")
+    } else {
+      convertToH264()
+    }
+  }
+
 
   const convertToH264 = async () => {
+
     setConverting(true)
     // Turn file data into Uint8Array
     const fileData = await fetchFile(inputVideo)
@@ -118,7 +128,7 @@ const Converter = () => {
     // This converts to h265 format. Not implemented as h265 playback is not currently supported by browsers. 
     // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
 
-    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${endMinusStart(endTrim, startTrim)}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
+    await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
     const outputData = ffmpeg.FS('readFile', 'output.mp4')
     const outputVideo = new Blob([outputData.buffer], { type: 'video/mp4' })
 
@@ -132,14 +142,15 @@ const Converter = () => {
       'Duration': info.Duration,
       'FileType': info.Format
     }
-    console.log(metadata)
+    // console.log(metadata)
     setOutputVideoInfo(metadata)
 
     // // Create a URL
     const url = URL.createObjectURL(outputVideo)
-    console.log(url)
+    // console.log(url)
     setConverting(false)
     setOutputVideo(url)
+  
   }
 
 
@@ -152,12 +163,13 @@ const Converter = () => {
       {/* Initial Stage after loading */}
       { !inputVideo &&
         <div className="">
-          <Dropzone onDrop={handleDrop} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
+          {/* <Dropzone onDrop={handleDrop, handleRejectedFiles} accept="video/mp4" maxSize={2147483648} maxFiles={1} > */}
+          <Dropzone onDropAccepted={handleDrop} onDropRejected={handleRejectedFiles} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
             {({ getRootProps, getInputProps }) => (
               <div className="w-full h-full bg-green-100">
                 <div {...getRootProps({ className: "w-screen border-4 border-dashed h-screen bg-gray-900 grid grid-cols-1 place-items-center" })}>
                   <input {...getInputProps()} />
-                  <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-bold text-center text-green-600">drag and drop<br></br>or click to select a video</p>
+                  <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-bold text-center text-green-600">drag and drop<br></br>or click to select mp4</p>
                 </div>
               </div>
             )}
@@ -365,7 +377,7 @@ const Converter = () => {
                       </div>
                     </fieldset>
                     <div className="flex items-center justify-around gap-4 w-full mt-8">
-                      <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-blue-300 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={convertToH264}>Convert</button>
+                      <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-blue-300 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={handleConvert}>Convert</button>
                       <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
                     </div>
                   </>
