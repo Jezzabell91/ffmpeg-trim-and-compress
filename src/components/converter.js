@@ -1,5 +1,5 @@
 import { getInfo } from 'react-mediainfo'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useReducer, useContext } from 'react'
 import Dropzone from 'react-dropzone'
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
 import bytesToMegaBytes from '../helpers/bytesToMegaBytes'
@@ -7,6 +7,10 @@ import convertTimeFormat from '../helpers/convertTimeFormat'
 import convertTimeToSeconds from '../helpers/convertTimeToSeconds'
 import endMinusStart from '../helpers/endMinusStart'
 import InputMask from "react-input-mask"
+import QualitySelection from '../components/qualityButtons'
+
+import AppContext from '../context/app-context'
+
 
 const ffmpeg = createFFmpeg({ log: true })
 
@@ -19,10 +23,9 @@ const Converter = () => {
   const [converting, setConverting] = useState(false)
   const [startTrim, setStartTrim] = useState('00:00:00.000')
   const [endTrim, setEndTrim] = useState(0)
-  const [quality, setQuality] = useState(480)
-  const [activeRadio, setActiveRadio] = useState(0)
 
 
+  const { quality, setQuality} = useContext(AppContext)
 
   // Load ffmpeg 
   const load = async () => {
@@ -39,7 +42,7 @@ const Converter = () => {
   }, [startTrim, endTrim])
 
   useEffect(() => {
-    // console.log("quality:", quality)
+    console.log("quality:", quality)
   }, [quality])
 
 
@@ -79,11 +82,6 @@ const Converter = () => {
     // console.log(`${position} trim: ${timerValue}`)
   }
 
-  const handleQualityChange = e => {
-    // console.log(e.target.value)
-    setQuality(e.target.value)
-  }
-
   const handleReset = () => {
     setinputVideoInfo({})
     setinputVideo(null)
@@ -92,7 +90,6 @@ const Converter = () => {
     setStartTrim('00:00:00.000')
     setEndTrim(0)
     setQuality(480)
-    setActiveRadio(0)
   }
 
   const handleConvert = () => {
@@ -333,48 +330,7 @@ const Converter = () => {
                           </div>
                         </div>
                       </div>
-                      <legend className="sr-only">
-                        Video Quality
-  </legend>
-                      <div className="relative bg-pink-50 rounded-md -space-y-px" onChange={handleQualityChange}>
-
-                        <label className={`${(activeRadio === 1) ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(1)} >
-                          <div className="flex items-center text-sm">
-                            <input type="radio" name="quality" value="480" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-0-label" aria-describedby="quality-0-description-0 quality-0-description-1" />
-                            <span id="quality-0-label" className="ml-3 font-medium text-gray-900">480p</span>
-                          </div>
-                          <p id="quality-0-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
-                            {/* <span className={`${activeRadio === 1 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Very Low Size </span> */}
-                            <span className={`${activeRadio === 1 ? 'text-indigo-700' : 'text-gray-500'}`}> Medium Conversion Time</span>
-                          </p>
-                          <p id="quality-0-description-1" className={`${activeRadio === 1 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~50mb</p>
-                        </label>
-
-                        <label className={`${activeRadio === 2 ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(2)} >
-                          <div className="flex items-center text-sm">
-                            <input type="radio" name="quality" value="720" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-1-label" aria-describedby="quality-1-description-0 quality-1-description-1" />
-                            <span id="quality-1-label" className="ml-3 font-medium text-gray-900">720p</span>
-                          </div>
-                          <p id="quality-1-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
-                            {/* <span className={`${activeRadio === 2 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Low Size </span> */}
-                            <span className={`${activeRadio === 2 ? 'text-indigo-700' : 'text-gray-500'}`}> Slow Conversion Time</span>
-                          </p>
-                          <p id="quality-1-description-1" className={`${activeRadio === 2 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~120mb</p>
-                        </label>
-
-                        <label className={`${activeRadio === 3 ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200'} rounded-tl-md rounded-tr-md relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3`} onClick={() => setActiveRadio(3)} >
-                          <div className="flex items-center text-sm">
-                            <input type="radio" name="quality" value="1080" className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" aria-labelledby="quality-2-label" aria-describedby="quality-2-description-0 quality-2-description-1" />
-                            <span id="quality-2-label" className="ml-3 font-medium text-gray-900">1080p</span>
-                          </div>
-                          <p id="quality-2-description-0" className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
-                            {/* <span className={`${activeRadio === 3 ? 'text-indigo-900' : 'text-gray-900'} font-medium`}>Mid Size </span> */}
-                            <span className={`${activeRadio === 3 ? 'text-indigo-700' : 'text-gray-500'}`}> Very Slow Conversion Time</span>
-                          </p>
-                          <p id="quality-2-description-1" className={`${activeRadio === 3 ? 'text-indigo-700' : 'text-gray-500'} ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-right`}>5 Mins = ~200mb</p>
-                        </label>
-
-                      </div>
+                                <QualitySelection />
                     </fieldset>
                     <div className="flex items-center justify-around gap-4 w-full mt-8">
                       <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={handleConvert}>Convert</button>
