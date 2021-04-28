@@ -296,7 +296,7 @@ const Converter = () => {
                               '9': '[0-9]',
                               '5': '[0-5]',
                             }}
-                              mask="99:59:59.999" defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
+                              mask="99:59:59.999" maskPlaceholder={'^'} defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
                               {(inputProps) => (
                                 <input
                                   {...inputProps}
@@ -321,7 +321,7 @@ const Converter = () => {
                               '9': '[0-9]',
                               '5': '[0-5]',
                             }}
-                              mask="99:59:59.999" defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
+                              mask="99:59:59.999" maskPlaceholder={0} defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
                               {(inputProps) => (
                                 <input
                                   {...inputProps}
