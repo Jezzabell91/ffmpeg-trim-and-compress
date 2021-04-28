@@ -1,9 +1,12 @@
 import Converter from './components/converter'
+import AppState from './context/AppState'
 
 const App = () => {
 
   return(
-    <Converter />
+    <AppState>
+      <Converter />
+    </AppState>
   )
   
 }
