@@ -1,6 +1,6 @@
 import { getInfo } from 'react-mediainfo'
 import { useEffect, useState, useReducer, useContext } from 'react'
-import Dropzone from 'react-dropzone'
+import DropArea from '../components/DropArea'
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
 import bytesToMegaBytes from '../helpers/bytesToMegaBytes'
 import convertTimeFormat from '../helpers/convertTimeFormat'
@@ -8,6 +8,7 @@ import convertTimeToSeconds from '../helpers/convertTimeToSeconds'
 import endMinusStart from '../helpers/endMinusStart'
 import InputMask from "react-input-mask"
 import QualitySelection from '../components/qualityButtons'
+import ResetButton from './ResetButton'
 
 import AppContext from '../context/app-context'
 
@@ -15,15 +16,22 @@ import AppContext from '../context/app-context'
 const ffmpeg = createFFmpeg({ log: true })
 
 const Converter = () => {
-  const [inputVideo, setinputVideo] = useState(null)
-  const [outputVideo, setOutputVideo] = useState(null)
+
   const [ready, setReady] = useState(false)
-  const [converting, setConverting] = useState(false)
-  const [startTrim, setStartTrim] = useState('00:00:00.000')
-  const [endTrim, setEndTrim] = useState(0)
 
-
-  const { quality, setQuality} = useContext(AppContext)
+  const { quality,
+    setQuality,
+    inputVideo,
+    setInputVideo,
+    outputVideo,
+    setOutputVideo,
+    converting,
+    setConverting,
+    startTrim,
+    setStartTrim,
+    endTrim,
+    setEndTrim
+  } = useContext(AppContext)
 
   // Load ffmpeg 
   const load = async () => {
@@ -43,34 +51,6 @@ const Converter = () => {
     console.log("quality:", quality)
   }, [quality])
 
-
-  const handleDrop = async (files) => {
-    const file = files[0]
-    let info = await getInfo(file)
-    // console.log(info)
-    info = info.media.track[0]
-    const metadata = {
-      'FileName': files[0].name,
-      'FileSize': bytesToMegaBytes(info.FileSize),
-      'Duration': info.Duration,
-      'FileType': info.Format
-    }
-
-    // console.log(metadata)
-    setEndTrim(convertTimeFormat(metadata.Duration))
-
-    setinputVideo({
-      file: file,
-      metadata: metadata
-    })
-  }
-
-  const handleRejectedFiles = () => {
-
-    alert("Make sure that files are in mp4 format and are less than 2GB")
-    handleReset()
-  }
-
   const handleChange = (e, position) => {
     let timerValue = e.target.value
 
@@ -83,15 +63,7 @@ const Converter = () => {
     // console.log(`${position} trim: ${timerValue}`)
   }
 
-  const handleReset = () => {
-    // setinputVideoInfo({})
-    setinputVideo(null)
-    // setOutputVideoInfo({})
-    setOutputVideo(null)
-    setStartTrim('00:00:00.000')
-    setEndTrim(0)
-    setQuality(480)
-  }
+
 
   const handleConvert = () => {
     // Handle Errors 
@@ -150,38 +122,19 @@ const Converter = () => {
   }
 
 
-
-
-
   return ready ? (
     <div className="App md:w-screen md:h-screen lg:bg-gray-900 bg-green-600 grid grid-cols-1 place-items-center">
 
       {/* Initial Stage after loading */}
       { !inputVideo &&
-        <div className="">
-          <Dropzone onDropAccepted={handleDrop} onDropRejected={handleRejectedFiles} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
-            {({ getRootProps, getInputProps }) => (
-              <div className="w-full h-full bg-green-100">
-                <div {...getRootProps({ className: "w-screen border-4 border-dashed h-screen bg-gray-900 grid grid-cols-1 place-items-center" })}>
-                  <input {...getInputProps()} />
-                  <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-bold text-center text-green-600">drag and drop<br></br>or click to select mp4</p>
-                </div>
-              </div>
-            )}
-          </Dropzone>
-        </div>
+        <DropArea />
       }
 
 
       {/* Converting */}
 
-
       { converting &&
-        <>
-
           <p className="text-2xl font-normal text-center text-green-600">Converting... It could take a while, please be patient <br></br><span className="text-2xl">If you can hear your computer fans it's probably working</span></p>
-
-        </>
       }
 
       {/* View output */}
@@ -220,7 +173,7 @@ const Converter = () => {
                   </div>
                   <div className="flex items-center justify-around gap-4 w-full mt-8">
                     <a href={outputVideo.file} download={outputVideo.metadata.FileName} className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Download</a>
-                    <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+                    <ResetButton />
                   </div>
                 </div>
               </div>
@@ -331,7 +284,7 @@ const Converter = () => {
                     </fieldset>
                     <div className="flex items-center justify-around gap-4 w-full mt-8">
                       <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={handleConvert}>Convert</button>
-                      <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
+                      <ResetButton />
                     </div>
                   </>
                 }
