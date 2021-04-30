@@ -9,6 +9,7 @@ import endMinusStart from '../helpers/endMinusStart'
 import InputMask from "react-input-mask"
 import QualitySelection from '../components/qualityButtons'
 import ResetButton from './ResetButton'
+import VideoCard from './VideoCard'
 
 import AppContext from '../context/app-context'
 
@@ -144,33 +145,7 @@ const Converter = () => {
             <div class="max-w-3xl mx-auto">
               <div className="bg-transparent overflow-hidden rounded-lg max-w-xl h-full grid grid-cols-1 place-items-around gap-y-12">
                 <div className="px-4 py-5 sm:p-6 ">
-                  <div className="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-                    <div className="px-4 py-5 sm:p-6">
-                      <video
-                        controls
-                        width="480"
-                        src={outputVideo.file}>
-                      </video>
-                      <div className="px-4 py-4 sm:px-6">
-                        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                          <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
-                            <p className="text-sm font-medium text-gray-500">
-                              File:  <span className="mt-1 text-sm font-normal text-gray-900">{outputVideo.metadata.FileName}</span>
-                            </p>
-                            <p className="text-sm font-medium text-gray-500">
-                              Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(outputVideo.metadata.Duration)}</span>
-                            </p>
-                            <p className="text-sm font-medium text-gray-500">
-                              Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideo.metadata.FileSize)}MB</span>
-                            </p>
-                            <p className="text-sm font-medium text-gray-500">
-                              Type: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideo.metadata.FileType)}</span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <VideoCard video={"output"} />
                   <div className="flex items-center justify-around gap-4 w-full mt-8">
                     <a href={outputVideo.file} download={outputVideo.metadata.FileName} className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Download</a>
                     <ResetButton />
@@ -194,38 +169,7 @@ const Converter = () => {
               <div className="px-4 py-5 sm:p-6 ">
 
                 {(inputVideo && !outputVideo) &&
-                  <>
-                    {/* Card with footer */}
-                    <div className="bg-gray-50 overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-                      <div className="px-4 py-5 sm:p-6">
-                        <video
-                          controls
-                          width="480"
-                          src={URL.createObjectURL(inputVideo.file)}>
-                        </video>
-                        <div className="px-4 py-4 sm:px-6">
-                          <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-                            <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
-                              <p className="text-sm font-medium text-gray-500">
-                                File:  <span className="mt-1 text-sm font-normal text-gray-900">{inputVideo.metadata.FileName}</span>
-                              </p>
-                              <p className="text-sm font-medium text-gray-500">
-                                Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(inputVideo.metadata.Duration)}</span>
-                              </p>
-                              <p className="text-sm font-medium text-gray-500">
-                                Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideo.metadata.FileSize}MB</span>
-                              </p>
-                              <p className="text-sm font-medium text-gray-500">
-                                Type: <span className="mt-1 text-sm font-normal text-gray-900">{(inputVideo.metadata.FileType)}</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-
-                  </>
+                    <VideoCard video={"input"} />
                 }
                 {(!outputVideo) &&
                   <>
