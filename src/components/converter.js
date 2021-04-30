@@ -15,10 +15,8 @@ import AppContext from '../context/app-context'
 const ffmpeg = createFFmpeg({ log: true })
 
 const Converter = () => {
-  const [inputVideoInfo, setinputVideoInfo] = useState({})
-  const [inputVideo, setinputVideo] = useState()
-  const [outputVideoInfo, setOutputVideoInfo] = useState({})
-  const [outputVideo, setOutputVideo] = useState()
+  const [inputVideo, setinputVideo] = useState(null)
+  const [outputVideo, setOutputVideo] = useState(null)
   const [ready, setReady] = useState(false)
   const [converting, setConverting] = useState(false)
   const [startTrim, setStartTrim] = useState('00:00:00.000')
@@ -60,8 +58,11 @@ const Converter = () => {
 
     // console.log(metadata)
     setEndTrim(convertTimeFormat(metadata.Duration))
-    setinputVideoInfo(metadata)
-    setinputVideo(file)
+
+    setinputVideo({
+      file: file,
+      metadata: metadata
+    })
   }
 
   const handleRejectedFiles = () => {
@@ -83,9 +84,9 @@ const Converter = () => {
   }
 
   const handleReset = () => {
-    setinputVideoInfo({})
+    // setinputVideoInfo({})
     setinputVideo(null)
-    setOutputVideoInfo({})
+    // setOutputVideoInfo({})
     setOutputVideo(null)
     setStartTrim('00:00:00.000')
     setEndTrim(0)
@@ -96,8 +97,7 @@ const Converter = () => {
     // Handle Errors 
     if(endMinusStart(endTrim, startTrim) < 0){
       alert("end value must be bigger than start value")
-    // } else if(endMinusStart(convertTimeFormat(inputVideoInfo.Duration), endTrim) < 0) {
-    } else if(inputVideoInfo.Duration - convertTimeToSeconds(endTrim) < 0) {
+    } else if(inputVideo.metadata.Duration - convertTimeToSeconds(endTrim) < 0) {
       alert("end value must be less than input video duration")
     } else {
       convertToH264()
@@ -109,7 +109,7 @@ const Converter = () => {
 
     setConverting(true)
     // Turn file data into Uint8Array
-    const fileData = await fetchFile(inputVideo)
+    const fileData = await fetchFile(inputVideo.file)
 
     // Write to FS file system
     ffmpeg.FS('writeFile', 'trimInput.mp4', fileData)
@@ -134,19 +134,18 @@ const Converter = () => {
     // console.log(info)
 
     const metadata = {
-      'FileName': 'h264_' + inputVideoInfo.FileName,
+      'FileName': 'h264_' + inputVideo.metadata.FileName,
       'FileSize': bytesToMegaBytes(info.FileSize),
       'Duration': info.Duration,
       'FileType': info.Format
     }
     // console.log(metadata)
-    setOutputVideoInfo(metadata)
 
     // // Create a URL
     const url = URL.createObjectURL(outputVideo)
     // console.log(url)
     setConverting(false)
-    setOutputVideo(url)
+    setOutputVideo({file: url, metadata: metadata})
   
   }
 
@@ -160,7 +159,6 @@ const Converter = () => {
       {/* Initial Stage after loading */}
       { !inputVideo &&
         <div className="">
-          {/* <Dropzone onDrop={handleDrop, handleRejectedFiles} accept="video/mp4" maxSize={2147483648} maxFiles={1} > */}
           <Dropzone onDropAccepted={handleDrop} onDropRejected={handleRejectedFiles} accept="video/mp4" maxSize={2147483648} maxFiles={1} >
             {({ getRootProps, getInputProps }) => (
               <div className="w-full h-full bg-green-100">
@@ -198,22 +196,22 @@ const Converter = () => {
                       <video
                         controls
                         width="480"
-                        src={outputVideo}>
+                        src={outputVideo.file}>
                       </video>
                       <div className="px-4 py-4 sm:px-6">
                         <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                           <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
                             <p className="text-sm font-medium text-gray-500">
-                              File:  <span className="mt-1 text-sm font-normal text-gray-900">{outputVideoInfo.FileName}</span>
+                              File:  <span className="mt-1 text-sm font-normal text-gray-900">{outputVideo.metadata.FileName}</span>
                             </p>
                             <p className="text-sm font-medium text-gray-500">
-                              Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(outputVideoInfo.Duration)}</span>
+                              Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(outputVideo.metadata.Duration)}</span>
                             </p>
                             <p className="text-sm font-medium text-gray-500">
-                              Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileSize)}MB</span>
+                              Size: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideo.metadata.FileSize)}MB</span>
                             </p>
                             <p className="text-sm font-medium text-gray-500">
-                              Type: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideoInfo.FileType)}</span>
+                              Type: <span className="mt-1 text-sm font-normal text-gray-900">{(outputVideo.metadata.FileType)}</span>
                             </p>
                           </div>
                         </div>
@@ -221,8 +219,7 @@ const Converter = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-around gap-4 w-full mt-8">
-                    {/* <a href={outputVideo} download={outputVideoInfo.FileName}> Download</a> */}
-                    <a href={outputVideo} download={outputVideoInfo.FileName} className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Download</a>
+                    <a href={outputVideo.file} download={outputVideo.metadata.FileName} className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">Download</a>
                     <button type="button" className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-700 hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onClick={handleReset}>Reset</button>
                   </div>
                 </div>
@@ -251,22 +248,22 @@ const Converter = () => {
                         <video
                           controls
                           width="480"
-                          src={URL.createObjectURL(inputVideo)}>
+                          src={URL.createObjectURL(inputVideo.file)}>
                         </video>
                         <div className="px-4 py-4 sm:px-6">
                           <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                             <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:grid-cols-2">
                               <p className="text-sm font-medium text-gray-500">
-                                File:  <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.FileName}</span>
+                                File:  <span className="mt-1 text-sm font-normal text-gray-900">{inputVideo.metadata.FileName}</span>
                               </p>
                               <p className="text-sm font-medium text-gray-500">
-                                Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(inputVideoInfo.Duration)}</span>
+                                Duration: <span className="mt-1 text-sm font-normal text-gray-900">{convertTimeFormat(inputVideo.metadata.Duration)}</span>
                               </p>
                               <p className="text-sm font-medium text-gray-500">
-                                Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideoInfo.FileSize}MB</span>
+                                Size: <span className="mt-1 text-sm font-normal text-gray-900">{inputVideo.metadata.FileSize}MB</span>
                               </p>
                               <p className="text-sm font-medium text-gray-500">
-                                Type: <span className="mt-1 text-sm font-normal text-gray-900">{(inputVideoInfo.FileType)}</span>
+                                Type: <span className="mt-1 text-sm font-normal text-gray-900">{(inputVideo.metadata.FileType)}</span>
                               </p>
                             </div>
                           </div>
