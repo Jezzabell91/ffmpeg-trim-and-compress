@@ -1,4 +1,4 @@
-import QualitySelection from '../components/qualityButtons'
+import QualitySelection from './QualitySelection'
 import TrimInput from './TrimInput'
 
 const EditingOptions = () => {
