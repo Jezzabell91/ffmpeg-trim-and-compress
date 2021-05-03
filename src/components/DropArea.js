@@ -45,7 +45,6 @@ const DropArea = () => {
   }
 
   const handleRejectedFiles = () => {
-
     alert("Make sure that files are in mp4 format and are less than 2GB")
     reset()
   }
