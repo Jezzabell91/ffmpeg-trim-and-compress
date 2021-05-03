@@ -1,4 +1,4 @@
-const Loading = () => {
+const LoadingStage = () => {
 
       return (
         <div className="App md:w-screen md:h-screen lg:bg-gray-900 bg-green-600 grid grid-cols-1 place-items-center">
@@ -10,6 +10,6 @@ const Loading = () => {
 
 }
 
-export default Loading
+export default LoadingStage
 
 
