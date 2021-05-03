@@ -1,4 +1,4 @@
-import Converter from './components/converter'
+import Converter from './components/Converter'
 import AppState from './context/AppState'
 
 const App = () => {
