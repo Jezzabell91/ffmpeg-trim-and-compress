@@ -1,18 +1,18 @@
 import { getInfo } from 'react-mediainfo'
-import { useEffect, useState, useReducer, useContext } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import DropArea from '../components/DropArea'
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg'
 import bytesToMegaBytes from '../helpers/bytesToMegaBytes'
 import convertTimeFormat from '../helpers/convertTimeFormat'
 import convertTimeToSeconds from '../helpers/convertTimeToSeconds'
 import endMinusStart from '../helpers/endMinusStart'
-import InputMask from "react-input-mask"
-import QualitySelection from '../components/qualityButtons'
 import ResetButton from './ResetButton'
 import VideoCard from './VideoCard'
 import Loading from './Loading'
+import EditingOptions from './EditingOptions'
 
 import AppContext from '../context/app-context'
+
 
 
 const ffmpeg = createFFmpeg({ log: true })
@@ -52,19 +52,6 @@ const Converter = () => {
   useEffect(() => {
     console.log("quality:", quality)
   }, [quality])
-
-  const handleChange = (e, position) => {
-    let timerValue = e.target.value
-
-    if (position === 'start') {
-        setStartTrim(timerValue)
-      }
-    else if (position === 'end') {
-        setEndTrim(timerValue)
-      }
-    // console.log(`${position} trim: ${timerValue}`)
-  }
-
 
 
   const handleConvert = () => {
@@ -149,59 +136,7 @@ const Converter = () => {
               }
               {(!outputVideo) &&
                 <>
-                  <fieldset>
-                    <div className="flex justify-around w-full my-8 gap-4">
-                      <div className="flex-grow">
-                        <label htmlFor="start" className="sr-only">Start</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 hidden md:inline">
-                              Start
-                  </span>
-                          </div>
-                          <InputMask formatChars={{
-                            '9': '[0-9]',
-                            '5': '[0-5]',
-                          }}
-                            mask="99:59:59.999" maskPlaceholder={'^'} defaultValue={startTrim} onBlur={(e) => handleChange(e, 'start')}>
-                            {(inputProps) => (
-                              <input
-                                {...inputProps}
-                                type="text"
-                                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md text-center"
-                                name="start"
-                              />
-                            )}
-                          </InputMask>
-                        </div>
-                      </div>
-
-                      <div className="flex-grow">
-                        <label htmlFor="end" className="sr-only">End</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 hidden md:inline">
-                              End
-                            </span>
-                          </div>
-                          <InputMask formatChars={{
-                            '9': '[0-9]',
-                            '5': '[0-5]',
-                          }}
-                            mask="99:59:59.999" maskPlaceholder={0} defaultValue={endTrim} onBlur={(e) => handleChange(e, 'end')}>
-                            {(inputProps) => (
-                              <input
-                                {...inputProps}
-                                type="text"
-                                className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md w-24 text-center"
-                              />
-                            )}
-                          </InputMask>
-                        </div>
-                      </div>
-                    </div>
-                              <QualitySelection />
-                  </fieldset>
+                  <EditingOptions />
                   <div className="flex items-center justify-around gap-4 w-full mt-8">
                     <button type="button" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" onClick={handleConvert}>Convert</button>
                     <ResetButton />
