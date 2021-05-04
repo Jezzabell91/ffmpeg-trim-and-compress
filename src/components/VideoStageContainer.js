@@ -1,16 +1,21 @@
+import Header from './Header'
+import Footer from './Footer'
+
 const VideoStageContainer = (props) => {
 
-    return(
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 place-items-center gap-y-12">
-        <div class="max-w-3xl mx-auto">
-          <div className="bg-transparent overflow-hidden rounded-lg max-w-xl h-full grid grid-cols-1 place-items-around gap-y-12">
-            <div className="px-4 py-5 sm:p-6 ">
+  return (
+    <div className="min-h-screen  flex flex-col justify-center sm:px-6 lg:px-8">
+      <Header />
+      <div className="sm:mx-auto sm:w-full sm:max-w-2xl">
+        <div className="py-8 px-4 sm:px-10">
+          <div className="space-y-6 ">
             {props.children}
-            </div>
           </div>
+          <Footer />
         </div>
       </div>
-    )
+    </div>
+  )
 }
 
 export default VideoStageContainer

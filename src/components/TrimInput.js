@@ -26,10 +26,10 @@ const TrimInput = ({ label }) => {
     return (
         <div className="flex-grow">
         <label htmlFor="start" className="sr-only">{label}</label>
-        <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500 hidden md:inline">
-                {label}
+        <div className="relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 right-56 sm:right-auto pl-3 flex items-center pointer-events-none border  border-gray-200 bg-gray-900 px-3 rounded-l-md">
+                <span className="text-xl text-gray-50 inline">
+                {label} Trim 
       </span>
             </div>
             <InputMask formatChars={{
@@ -41,7 +41,7 @@ const TrimInput = ({ label }) => {
                     <input
                         {...inputProps}
                         type="text"
-                        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md text-center"
+                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full text-xl border-gray-300 rounded-md text-right"
                         name="start"
                     />
                 )}

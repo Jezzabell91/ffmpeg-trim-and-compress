@@ -51,7 +51,7 @@ const QualitySelection = () => {
                     <span className="rounded-full bg-white w-1.5 h-1.5" />
                   </span>
                   <RadioGroup.Label as="span" className="ml-3 font-medium text-gray-900">
-                    {option.value}
+                    {option.value}P
                   </RadioGroup.Label>
                 </div>
                 <RadioGroup.Description className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">

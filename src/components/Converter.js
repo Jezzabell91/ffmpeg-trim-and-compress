@@ -11,6 +11,7 @@ import LoadingStage from './LoadingStage'
 import ConvertingStage from './ConvertingStage'
 import EditingOptions from './EditingOptions'
 import AppContext from '../context/app-context'
+import Example from './Example'
 
 const ffmpeg = createFFmpeg({ log: true })
 
@@ -48,7 +49,7 @@ const Converter = () => {
         <LoadingStage />
   ) : (
     
-    <div className="App md:w-screen md:h-screen lg:bg-gray-900 bg-green-600 grid grid-cols-1 place-items-center">
+    <div className="App w-full h-full bg-gray-900 grid grid-cols-1 place-items-center">
 
     {/* Stage 1: Selecting. Show the drag and drop file area */}
     { !inputVideo &&
@@ -58,12 +59,12 @@ const Converter = () => {
     {/* Stage 2: Editing. Show the selected video and options for trimming and quality */}
     {  (inputVideo && !converting && !outputVideo) &&
         <VideoStageContainer>
-                  <VideoCard video={"input"} />
-                  <EditingOptions />
-                  <ButtonContainer>
-                    <ConvertButton ffmpeg={ffmpeg}/>
-                    <ResetButton />
-                  </ButtonContainer>
+        <VideoCard video={"input"} />
+        <EditingOptions />
+        <ButtonContainer>
+          <ConvertButton ffmpeg={ffmpeg}/>
+          <ResetButton />
+        </ButtonContainer>
         </VideoStageContainer>
     }
 
