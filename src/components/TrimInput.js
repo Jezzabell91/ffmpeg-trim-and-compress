@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import AppContext from '../context/app-context'
 
 import InputMask from "react-input-mask"
@@ -12,14 +12,32 @@ const TrimInput = ({ label }) => {
         setEndTrim
     } = useContext(AppContext)
 
+    const [valid, setValid] = useState(true)
+
+    const isValid = (timerValue) => {
+        // pattern is 99:59:59.999
+        const pattern = /^(\d\d)(:[0-5]\d){2}\.(\d){3}$/
+        if (pattern.test(timerValue)){
+            // console.log(timerValue, 'is valid')
+            setValid(true)
+            return true
+        } else {
+            // console.log(timerValue, 'is NOT valid')
+            setValid(false)
+            return false
+        }
+    }
+
     const handleChange = (e, position) => {
         let timerValue = e.target.value
 
-        if (position === 'Start') {
+        if (position === 'Start' && isValid(timerValue)) {
             setStartTrim(timerValue)
         }
-        else if (position === 'End') {
+        else if (position === 'End' && isValid(timerValue)) {
             setEndTrim(timerValue)
+        } else {
+            alert(`${position} Trim value, ${timerValue} is not valid.`)
         }
     }
 
@@ -41,7 +59,7 @@ const TrimInput = ({ label }) => {
                     <input
                         {...inputProps}
                         type="text"
-                        className="shadow-sm focus:ring-green-500 focus:border-green-500 block w-full text-xl border-gray-300 rounded-md text-right"
+                        className={valid ? "focus:ring-green-500 focus:border-green-500  border-gray-300 shadow-sm block w-full text-xl  rounded-md text-right" : "ring-red-500 border-4 border-red-500 shadow-sm block w-full text-xl  rounded-md text-right"}
                         name="start"
                     />
                 )}
