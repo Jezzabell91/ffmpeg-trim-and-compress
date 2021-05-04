@@ -1,6 +1,6 @@
 {
-  "name": "react-mediainfo-example",
-  "version": "0.1.0",
+  "name": "ffmpeg-trim-compress",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.1.1",
