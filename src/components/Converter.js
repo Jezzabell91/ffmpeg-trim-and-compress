@@ -11,7 +11,7 @@ import LoadingStage from './LoadingStage'
 import ConvertingStage from './ConvertingStage'
 import EditingOptions from './EditingOptions'
 import AppContext from '../context/app-context'
-import Example from './Example'
+
 
 const ffmpeg = createFFmpeg({ log: true })
 
