@@ -4,12 +4,12 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.1.1",
-    "@ffmpeg/ffmpeg": "^0.9.7",
-    "@headlessui/react": "^1.1.0",
+    "@ffmpeg/ffmpeg": "^0.9.8",
+    "@headlessui/react": "^1.1.1",
     "@tailwindcss/forms": "^0.3.2",
-    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
+    "@testing-library/user-event": "^13.1.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.3.2",
@@ -19,7 +19,7 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "craco start",
+    "start": "HTTPS=true SSL_CRT_FILE=./.cert/cert.pem SSL_KEY_FILE=./.cert/key.pem craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
@@ -43,9 +43,9 @@
     ]
   },
   "devDependencies": {
-    "@tailwindcss/postcss7-compat": "^2.1.0",
-    "autoprefixer": "^9.8.6",
-    "postcss": "^7.0.35",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.0"
+    "@tailwindcss/postcss7-compat": "npm:@tailwindcss/postcss7-compat@^2.1.0",
+    "autoprefixer": "^9",
+    "postcss": "^7",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
   }
 }
