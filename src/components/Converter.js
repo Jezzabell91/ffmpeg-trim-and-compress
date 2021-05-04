@@ -11,6 +11,7 @@ import LoadingStage from './LoadingStage'
 import ConvertingStage from './ConvertingStage'
 import EditingOptions from './EditingOptions'
 import AppContext from '../context/app-context'
+import NotCompatible from './NotCompatible'
 
 
 const ffmpeg = createFFmpeg({ log: true })
@@ -18,6 +19,7 @@ const ffmpeg = createFFmpeg({ log: true })
 const Converter = () => {
 
   const [ready, setReady] = useState(false)
+  const [compatible, setCompatible] = useState(false)
 
   const { 
     inputVideo,
@@ -27,8 +29,14 @@ const Converter = () => {
 
   // Load ffmpeg 
   const load = async () => {
-    await ffmpeg.load()
-    setReady(true)
+    try {
+      await ffmpeg.load()
+      setReady(true)
+      setCompatible(true)
+    } catch (error) {
+      setReady(true)
+      setCompatible(false)
+    }
   }
 
   useEffect(() => {
@@ -47,7 +55,7 @@ const Converter = () => {
         // Stage 0: Loading. Display while loading ffmpeg 
         // TODO: Implement spinner 
         <LoadingStage />
-  ) : (
+  ) : !compatible ? (<NotCompatible />) : (
     
     <div className="App w-full h-full bg-gray-900 grid grid-cols-1 place-items-center">
 
