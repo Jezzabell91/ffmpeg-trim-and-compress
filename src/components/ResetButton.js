@@ -8,7 +8,8 @@ const ResetButton = () => {
         setInputVideo,
         setOutputVideo,
         setStartTrim,
-        setEndTrim
+        setEndTrim,
+        setRemoveAudio,
       } = useContext(AppContext)
 
       const handleReset = () => {
@@ -17,6 +18,7 @@ const ResetButton = () => {
         setStartTrim('00:00:00.000')
         setEndTrim(0)
         setQuality(480)
+        setRemoveAudio(false)
       }
 
       return (

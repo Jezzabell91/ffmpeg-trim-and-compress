@@ -15,6 +15,7 @@ const ConvertButton = ( { ffmpeg }) => {
         inputVideo,
         setOutputVideo,
         setConverting,
+        removeAudio,
         startTrim,
         endTrim
       } = useContext(AppContext)
@@ -51,8 +52,14 @@ const ConvertButton = ( { ffmpeg }) => {
     
         // This converts to h265 format. Not implemented as h265 playback is not currently supported by browsers. 
         // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
-    
-        await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
+        
+        
+        if (removeAudio) {
+          await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-an', 'output.mp4')
+        } else {
+          await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
+        }
+
         const outputData = ffmpeg.FS('readFile', 'output.mp4')
         const outputVideo = new Blob([outputData.buffer], { type: 'video/mp4' })
     
@@ -61,7 +68,7 @@ const ConvertButton = ( { ffmpeg }) => {
         // console.log(info)
     
         const metadata = {
-          'FileName': 'h264_' + inputVideo.metadata.FileName,
+          'FileName': 'edited_' + inputVideo.metadata.FileName,
           'FileSize': bytesToMegaBytes(info.FileSize),
           'Duration': info.Duration,
           'FileType': info.Format

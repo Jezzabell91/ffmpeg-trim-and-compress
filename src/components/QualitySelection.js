@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { RadioGroup } from '@headlessui/react'
 import AppContext from '../context/app-context'
-
+import AudioToggle from './AudioToggle'
 
 
 const qualityOptions = [
@@ -34,7 +34,7 @@ const QualitySelection = () => {
                 optionIdx === 0 ? 'rounded-tl-md rounded-tr-md' : '',
                 optionIdx === qualityOptions.length - 1 ? 'rounded-bl-md rounded-br-md' : '',
                 checked ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200',
-                'relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 md:grid md:grid-cols-3 focus:outline-none'
+                'relative border p-4 flex flex-col cursor-pointer md:pl-4 md:pr-6 grid grid-cols-3 focus:outline-none'
               )
             }
           >
@@ -55,7 +55,7 @@ const QualitySelection = () => {
                     {option.value}P
                   </RadioGroup.Label>
                 </div>
-                <RadioGroup.Description className="ml-6 pl-1 text-sm md:ml-0 md:pl-0 md:text-center">
+                <RadioGroup.Description className=" pl-1 text-sm ml-0 pl-0 ">
                   <span className={classNames(checked ? 'text-indigo-900' : 'text-gray-900', 'font-medium')}>
                     {option.conversionTime}
                   </span>
@@ -72,6 +72,7 @@ const QualitySelection = () => {
             )}
           </RadioGroup.Option>
         ))}
+        <AudioToggle className="" />
       </div>
     </RadioGroup>
   )

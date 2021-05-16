@@ -9,6 +9,7 @@ const AppState = (props) => {
     const [converting, setConverting] = useState(false)
     const [startTrim, setStartTrim] = useState('00:00:00.000')
     const [endTrim, setEndTrim] = useState(0)
+    const [removeAudio, setRemoveAudio] = useState(false)
 
     return (
         <AppContext.Provider value={{
@@ -24,6 +25,8 @@ const AppState = (props) => {
             setStartTrim,
             endTrim,
             setEndTrim,
+            removeAudio,
+            setRemoveAudio
         }}>
             {props.children}
         </AppContext.Provider>
