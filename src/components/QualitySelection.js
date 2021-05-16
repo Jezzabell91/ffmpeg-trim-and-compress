@@ -5,7 +5,8 @@ import AppContext from '../context/app-context'
 
 
 const qualityOptions = [
-  { name: '480p', value: 480, conversionTime: 'Medium Conversion Time', conversionSize: '5 Mins = ~50mb' },
+  { name: '480p', value: 480, conversionTime: 'Fast Conversion Time', conversionSize: '5 Mins = ~50mb' },
+  { name: '576p', value: 576, conversionTime: 'Medium Conversion Time', conversionSize: '5 Mins = ~70mb' },
   { name: '720p', value: 720, conversionTime: 'Slow Conversion Time', conversionSize: '5 Mins = ~120mb' },
   { name: '1080p', value: 1080, conversionTime: 'Very Slow Conversion Time', conversionSize: '5 Mins = ~200mb' },
 ]
