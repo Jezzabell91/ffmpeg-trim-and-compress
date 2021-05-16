@@ -54,8 +54,12 @@ const ConvertButton = ( { ffmpeg }) => {
         // await ffmpeg.run('-i', 'input.mp4', '-c:v', 'libx265', '-pix_fmt', 'yuv420p12le', '-preset', 'medium', '-crf', '26', 'output.mp4')
         
         
-        if (removeAudio) {
+        if (removeAudio && quality === 'Trim Only') {
+          await ffmpeg.run('-ss', '00:00:00', '-i', 'input.mp4', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-c:v', 'copy', '-an', 'output.mp4')
+        } else if (removeAudio) {
           await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-an', 'output.mp4')
+        } else if (quality === 'Trim Only') {
+          await ffmpeg.run('-ss', '00:00:00', '-i', 'input.mp4', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-c:v', 'copy', 'output.mp4')
         } else {
           await ffmpeg.run('-i', 'input.mp4', '-ss', '00:00:00', '-to', `${convertTimeFormat(endMinusStart(endTrim, startTrim))}`, '-vf', `scale=-2:${quality}`, '-c:v', 'libx264', '-crf', '28', '-preset', 'fast', '-c:a', 'aac', '-b:a', '128k', 'output.mp4')
         }

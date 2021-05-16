@@ -5,6 +5,7 @@ import AudioToggle from './AudioToggle'
 
 
 const qualityOptions = [
+  { name: 'Trim Only', value: 'Trim Only', conversionTime: 'Trim Without Compression', conversionSize: '' },
   { name: '480p', value: 480, conversionTime: 'Fast Conversion Time', conversionSize: '5 Mins = ~50mb' },
   { name: '576p', value: 576, conversionTime: 'Medium Conversion Time', conversionSize: '5 Mins = ~70mb' },
   { name: '720p', value: 720, conversionTime: 'Slow Conversion Time', conversionSize: '5 Mins = ~120mb' },
@@ -52,7 +53,7 @@ const QualitySelection = () => {
                     <span className="rounded-full bg-white w-1.5 h-1.5" />
                   </span>
                   <RadioGroup.Label as="span" className="ml-3 font-medium text-gray-900">
-                    {option.value}P
+                    {option.value !== 'Trim Only' ? `${option.value}P` : option.value}
                   </RadioGroup.Label>
                 </div>
                 <RadioGroup.Description className=" pl-1 text-sm ml-0 pl-0 ">
