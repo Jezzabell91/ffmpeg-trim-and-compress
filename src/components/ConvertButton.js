@@ -43,7 +43,7 @@ const ConvertButton = ( { ffmpeg }) => {
         ffmpeg.FS('writeFile', 'trimInput.mp4', fileData)
     
         // Trim with input seeking to speed up conversion 
-        await ffmpeg.run('-ss', `${startTrim}`, '-i', 'trimInput.mp4', '-to', `${endTrim}`, '-c:v', 'copy', '-c:a', 'copy', 'trimOutput.mp4')
+        await ffmpeg.run('-ss', `${startTrim}`, '-i', 'trimInput.mp4', '-to', `${endTrim}`, '-c:v', 'copy', '-c:a', 'copy', '-max_muxing_queue_size', '1024', 'trimOutput.mp4')
     
         // // Read the result of trim 
         const data = ffmpeg.FS('readFile', 'trimOutput.mp4')
